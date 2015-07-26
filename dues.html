@@ -11,17 +11,19 @@
 </head>
 <body>
 
-    <div class="container" ng-app="scc" ng-controller="DuesController">
+    <div class="container" ng-app="payment" ng-controller="DuesController">
         <div class="page-header">
             <h1>Schenectady Curling Club - Dues Payment</h1>
         </div>
         <div class="row">
             <div class="col-xs-12">
-                <p>To pay your dues online, please fill out the form below.  If
-                    you are paying for several members, such as yourself and your
-                    spouse, fill out the form separately for each member.</p>
-                <p>See the club's published information for details such as league
-                    eligibility</p>
+                <div class="alert alert-info">To pay your dues online, please fill out the
+                form below.  If you are paying for several members, such as
+                yourself and your spouse, fill out the form separately for each
+                member.</div>
+                <div class="alert alert-warning">NOTE: See the club's published
+                information or talk to another member for details such as
+                league eligibility</div>
             </div>
         </div>
         <form name="duesForm" novalidate class="form-horizontal">
@@ -40,46 +42,10 @@
                 </div>
             </div>
             <div class="form-group">
-                <label for="email" class="col-sm-2 control-label">Member's Email</label>
+                <label for="email" class="col-sm-2 control-label">Member's Email Address</label>
                 <div class="col-sm-10">
                     <input type="text" class="form-control" name="email"
                             ng-model="email" placeholder="name@service.com">
-                </div>
-            </div>
-            <div class="form-group">
-                <!-- TODO: will have to split this -->
-                <label for="phone" class="col-sm-2 control-label">Member's Phone Number</label>
-                <div class="col-sm-10">
-                    <input type="text" class="form-control" name="phone"
-                            ng-model="phone" placeholder="518-555-1212" required>
-                </div>
-            </div>
-            <div class="form-group">
-                <label for="address1" class="col-sm-2 control-label">Member's Address</label>
-                <div class="col-sm-10">
-                    <input type="text" class="form-control" name="address1"
-                            ng-model="address1" placeholder="1084 Balltown Rd" required>
-                </div>
-            </div>
-            <div class="form-group">
-                <label for="city" class="col-sm-2 control-label">City</label>
-                <div class="col-sm-10">
-                    <input type="text" class="form-control" name="city"
-                            ng-model="city" required>
-                </div>
-            </div>
-            <div class="form-group">
-                <label for="state" class="col-sm-2 control-label">State</label>
-                <div class="col-sm-10">
-                    <input type="text" class="form-control" name="state"
-                            ng-model="state" required>
-                </div>
-            </div>
-            <div class="form-group">
-                <label for="zip" class="col-sm-2 control-label">Zip</label>
-                <div class="col-sm-10">
-                    <input type="text" class="form-control" name="zip"
-                            ng-model="zip"required>
                 </div>
             </div>
             <hr />
@@ -92,16 +58,37 @@
                             {{lvl.name}} - ${{lvl.dues}}
                         </option>
                     </select>
-                    <!-- TODO: membership year when needed -->
                 </div>
             </div>
-            <!-- TODO: hide if no leagues -->
+            <div class="form-group">
+                <label for="member_years"
+                    class="col-sm-2 control-label">Membership Years</label>
+                <div class="col-sm-10">
+                    <input name="member_years" type="radio" value="1"
+                        ng-model="member_years" />
+                        First Year member
+                        &nbsp;
+                    <input name="member_years" type="radio" value="2"
+                        ng-model="member_years" />
+                        Second Year member
+                        &nbsp;
+                    <input name="member_years" type="radio" value="3"
+                        ng-model="member_years" />
+                        Third Year or higher
+                </div>
+            </div>
             <div class="form-group">
                 <label class="col-sm-2 control-label">Leagues</label>
-                <!-- TODO: "League fees limited to.." -->
                 <div class="col-sm-10">
                     <div class="row">
-                        <div class="col-xs-5"></div>
+                        <div class="col-xs-5">
+                            <span ng-if="league_fee_limit > 0" class="text-muted">
+                                League fees capped at ${{league_fee_limit}}
+                            </span>
+                            <span ng-if="league_fee_limit == 0" class="text-muted">
+                                League fees included in membership
+                            </span>
+                        </div>
                         <div class="col-xs-7">
                             <p>Add notes for the league chair here - skip, position, shift, etc.</p>
                         </div>
@@ -146,8 +133,8 @@
             </div>
             <hr />
             <div class="form-group">
-                <label class="col-sm-2 control-label">Membership Dues</label>
-                <div class="col-sm-10">
+                <label class="col-sm-2 control-label">Dues</label>
+                <div class="col-sm-6">
                     <ul>
                         <li ng-repeat="item in cart">
                             {{item.name}}
@@ -155,63 +142,16 @@
                             <span ng-if="item.notes"> - <em>{{item.notes}}</em></span>
                         </li>
                     </ul>
-                    Total: ${{total_dues}}
+                    <b>Total:</b> ${{total_dues}}
+                </div>
+                <div class="col-sm-4">
+                    <button ng-click="pay()"
+                            ng-disabled="duesForm.$invalid"
+                            class="btn btn-block btn-success">Pay Now</button>
                 </div>
             </div>
         </form>
-    </div><!-- /.container -->
-
-    <div class="container"
-<!-- https://www.paypal.com/cgi-bin/webscr?cmd=p/pdn/howto_checkout-outside --!>
-<form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top">
-    <input type="hidden" name="cmd" value="_ext-enter">
-    <input type="hidden" name="redirect_cmd" value="_cart">
-    <input type="hidden" name="business" value="sheltieshores@gmail.com">
-    <input type="hidden" name="item_name" value="Schenectady Curling Club Dues">
-    <input type="hidden" name="first_name" value="Dustin J.">
-    <input type="hidden" name="last_name" value="Mitchell">
-    <input type="hidden" name="email" value="dustin@cs.uchicago.edu">
-    <input type="hidden" name="custom" value="314-616-2667">
-    <input type="hidden" name="address1" value="1174 Van Antwerp Road">
-    <input type="hidden" name="city" value="Niskayuna">
-    <input type="hidden" name="state" value="NY">
-    <input type="hidden" name="zip" value="12309">
-    <input type="hidden" name="day_phone_a" value="314">
-    <input type="hidden" name="day_phone_b" value="616">
-    <input type="hidden" name="day_phone_c" value="2667">
-    <input type="hidden" name="no_note" value="1">
-    <input type="hidden" name="currency_code" value="USD">
-    <input type="hidden" name="lc" value="US">
-    <!-- TODO: or should we ask for shipping address as a way of capturing it? -->
-    <input type="hidden" name="no_shipping" value="1">
-    <!-- TOOD: send to a thank-you landing page -->
-    <input type="hidden" name="return" value="http://schenectadycurlingclub.us">
-    <input type="hidden" name="cancel" value="http://schenectadycurlingclub.us">
-    <input type="hidden" name="amount" value="50.00">
-    <input type="hidden" name="upload" value="1">
-
-    <input type="hidden" name="item_name_1" value="Regular Membership">
-    <input type="hidden" name="amount_1" value="2.25">
-    <input type="hidden" name="on0_1" value="Year">
-    <input type="hidden" name="os0_1" value="First">
-
-    <input type="hidden" name="item_name_2" value="Pletenik League">
-    <input type="hidden" name="amount_2" value="0.50">
-    <input type="hidden" name="on0_2" value="Notes">
-    <input type="hidden" name="os0_2" value="Vice for Kirk">
-
-    <input type="hidden" name="item_name_3" value="Erdman League">
-    <input type="hidden" name="amount_3" value="0.00">
-    <input type="hidden" name="on0_3" value="Notes">
-    <input type="hidden" name="os0_3" value="Same team as Sarah Berke">
-    <input type="hidden" name="on1_3" value="Price">
-    <input type="hidden" name="os1_3" value="Meets membership limit">
-
-    <input type="image" src="https://www.paypalobjects.com/en_US/i/btn/btn_buynowCC_LG.gif" border="0" name="submit" alt="PayPal - The safer, easier way to pay online!">
-    <img alt="" border="0" src="https://www.paypalobjects.com/en_US/i/scr/pixel.gif" width="1" height="1">
-</form>
-</div>
-
+    </div>
 </body>
 </html>
 
